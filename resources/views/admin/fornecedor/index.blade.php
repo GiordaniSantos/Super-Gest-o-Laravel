@@ -1,19 +1,27 @@
-<h3>Fornecedor view</h3>
+@section('titulo', 'Fornecedores')
 
-{{ "Texto de teste" }} 
-é o mesmo que 
-<?= "Texto de teste"?>
-
-{{-- Fica o comentário que será descartado pelo interpretador do Blade --}}
-
-@php
-    // Para comentários puro php
-@endphp
-
-@if(count($fornecedores) > 0 && count($fornecedores) < 10)
-  <h3>Teste </h3>
-@elseif(count($fornecedores) > 10)
-    teste errado
-@else
-    teste else
-@endif
+<x-app-layout>
+    <div class="conteudo-pagina">
+        <div class="titulo-pagina-2">
+            <p>Fornecedor</p>
+        </div>
+        <div class="menu">
+            <ul>
+                <li><a href="{{ route('admin.fornecedor.adicionar') }}">Novo</a></li>
+                <li><a href="{{ route('admin.fornecedor') }}">Consulta</a></li>
+            </ul>
+        </div>
+        <div class="informacao-pagina">
+            <div style="width:30%; margin-left: auto; margin-right:auto;">
+                <form method="post" action="{{ route('admin.fornecedor.listar') }}">
+                    @csrf
+                    <input type="text" name="Nome" placeholder="Nome" class="borda-preta">
+                    <input type="text" name="site" placeholder="Site" class="borda-preta">
+                    <input type="text" name="uf" placeholder="UF" class="borda-preta">
+                    <input type="text" name="email" placeholder="email" class="borda-preta">
+                    <button type="submit" class="borda-preta">Pesquisar</button>
+                <form>
+            </div>
+        </div>
+    </div>
+</x-app-layout>
