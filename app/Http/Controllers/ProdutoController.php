@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Produto;
 use App\Models\Unidade;
+use App\Models\Fornecedor;
+use App\Models\ProdutoDetalhe;
 use Illuminate\Http\Request;
 
 class ProdutoController extends Controller
@@ -15,7 +17,21 @@ class ProdutoController extends Controller
      */
     public function index(Request $request)
     {
-        $produtos = Produto::paginate(10);
+        $produtos = Produto::with(['produtoDetalhe'])->paginate(10);
+
+        
+
+        /* jeito menos elegante de obter relacionamento 1x1
+
+        foreach($produtos as $key => $produto){
+            $produtoDetalhe = ProdutoDetalhe::where('produto_id', $produto->id)->first();
+
+            if(isset($produtoDetalhe)){
+                $produtos[$key]['comprimento'] = $produtoDetalhe->comprimento;
+                $produtos[$key]['largura'] = $produtoDetalhe->largura;
+                $produtos[$key]['altura'] = $produtoDetalhe->altura;
+            }
+        }*/
 
 
 
@@ -30,7 +46,8 @@ class ProdutoController extends Controller
     public function create()
     {
         $unidades = Unidade::all();
-        return view('admin.produto.create', ['unidades' => $unidades]);
+        $fornecedores = Fornecedor::all();
+        return view('admin.produto.create', ['unidades' => $unidades, 'fornecedores' => $fornecedores]);
     }
 
     /**
@@ -51,25 +68,25 @@ class ProdutoController extends Controller
                 'nome' => 'required',
                 'descricao' => 'required',
                 'peso' => 'required|integer',
-                'unidade_id' => 'exists:unidades,id'
+                'unidade_id' => 'exists:unidades,id',
+                'fornecedor_id' => 'exists:fornecedores,id'
             ];
 
             $feedback = [
                 'required' => 'O campo :attribute deve ser preenchido',
                 'peso.integer' => "O campo deve ser um número inteiro",
-                'unidade_id.exists' => "A unidade de medida informada não existe!"
+                'unidade_id.exists' => "A unidade de medida informada não existe!",
+                'fornecedor_id.exists' => "O fornecedor informado não existe!"
             ];
 
             $request->validate($regras, $feedback);
 
-            $fornecedor = new Fornecedor();
+            $produto = new Produto();
 
             //vai preencher o objeto de acordo com a variavel fillable no model
-            $fornecedor->create($request->all());
+            $produto->create($request->all());
             $msg = "Cadastro realizado com sucesso!";
         }
-
-        Produto::create($request->all());
 
         return redirect()->route('produto.index');
     }
@@ -82,7 +99,7 @@ class ProdutoController extends Controller
      */
     public function show(Produto $produto)
     {
-        //
+        return view('admin.produto.show', ['produto' => $produto]);
     }
 
     /**
@@ -93,7 +110,10 @@ class ProdutoController extends Controller
      */
     public function edit(Produto $produto)
     {
-        //
+        $unidades = Unidade::all();
+        $fornecedores = Fornecedor::all();
+        //talvez tenha que refazer a validação do form como no create
+        return view('admin.produto.edit', ['produto' => $produto, 'unidades' => $unidades , 'fornecedores' => $fornecedores]);
     }
 
     /**
@@ -105,7 +125,38 @@ class ProdutoController extends Controller
      */
     public function update(Request $request, Produto $produto)
     {
-        //
+
+        $msg = '';
+
+        //inclusao
+        if($request->input('_token') != '' && $request->input('id') == ''){
+            //validacao
+            $regras = [
+                'nome' => 'required',
+                'descricao' => 'required',
+                'peso' => 'required|integer',
+                'unidade_id' => 'exists:unidades,id',
+                'fornecedor_id' => 'exists:fornecedores,id'
+            ];
+
+            $feedback = [
+                'required' => 'O campo :attribute deve ser preenchido',
+                'peso.integer' => "O campo deve ser um número inteiro",
+                'unidade_id.exists' => "A unidade de medida informada não existe!",
+                'fornecedor_id.exists' => "O fornecedor informado não existe!"
+            ];
+
+            $request->validate($regras, $feedback);
+
+            $produto = new Produto();
+
+            //vai preencher o objeto de acordo com a variavel fillable no model
+            $produto->create($request->all());
+            $msg = "Cadastro realizado com sucesso!";
+        }
+
+        $produto->update($request->all());
+        return redirect()->route('produto.show', ['produto' => $produto->id]);
     }
 
     /**
@@ -114,8 +165,10 @@ class ProdutoController extends Controller
      * @param  \App\Models\Produto  $produto
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Produto $produto)
+    public function destroy(Produto $produto, Request $request)
     {
-        //
+        $produto->delete();
+       
+        return redirect()->route('produto.index');
     }
 }

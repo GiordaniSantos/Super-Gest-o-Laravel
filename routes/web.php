@@ -59,10 +59,6 @@ Route::middleware([
     Route::get('/dashboard', function () {
         return view('admin.dashboard');
     })->name('dashboard');
-
-    Route::get('/admin', [\App\Http\Controllers\AdminController::class, 'index'])->name('admin.admin');
-
-    Route::get('/cliente', [\App\Http\Controllers\ClienteController::class, 'index'])->name('admin.cliente');
     
     Route::get('/fornecedor', [\App\Http\Controllers\FornecedorController::class, 'index'])->name('admin.fornecedor');
     Route::post('/fornecedor/listar', [\App\Http\Controllers\FornecedorController::class, 'listar'])->name('admin.fornecedor.listar');
@@ -74,4 +70,11 @@ Route::middleware([
 
     //produtos
     Route::resource('produto', \App\Http\Controllers\ProdutoController::class);
+
+    //produtos detalhes
+    Route::resource('produto-detalhe', \App\Http\Controllers\ProdutoDetalheController::class);
+
+    Route::resource('cliente', \App\Http\Controllers\ClienteController::class);
+    Route::resource('pedido', \App\Http\Controllers\PedidoController::class);
+    Route::resource('pedido-p   roduto', \App\Http\Controllers\PedidoProdutoController::class);
 });

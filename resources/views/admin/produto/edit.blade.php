@@ -1,9 +1,9 @@
-@section('titulo', 'Adicionar Produto')
+@section('titulo', 'Editar Produto')
 
 <x-app-layout>
     <div class="conteudo-pagina">
         <div class="titulo-pagina-2">
-            <p>Produto - Adicionar</p>
+            <p>Produto - Editar</p>
         </div>
         <div class="menu">
             <ul>
@@ -13,7 +13,7 @@
         </div>
         <div class="informacao-pagina">
             <div style="width:30%; margin-left: auto; margin-right:auto;">
-                @component('admin.produto._components.form_create_edit', ['unidades' => $unidades, 'fornecedores' => $fornecedores])
+                @component('admin.produto._components.form_create_edit', ['produto' => $produto, 'unidades' => $unidades, 'fornecedores' => $fornecedores])
                 @endcomponent
             </div>
         </div>

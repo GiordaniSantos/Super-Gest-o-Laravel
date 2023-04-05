@@ -17,7 +17,7 @@ class FornecedorController extends Controller
         ->where('site', 'like', '%'.$request->input('site').'%')
         ->where('uf', 'like', '%'.$request->input('uf').'%')
         ->where('email', 'like', '%'.$request->input('email').'%')
-        ->paginate(1);
+        ->paginate(5);
 
 
 
