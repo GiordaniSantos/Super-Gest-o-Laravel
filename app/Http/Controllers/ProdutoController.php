@@ -148,10 +148,6 @@ class ProdutoController extends Controller
 
             $request->validate($regras, $feedback);
 
-            $produto = new Produto();
-
-            //vai preencher o objeto de acordo com a variavel fillable no model
-            $produto->create($request->all());
             $msg = "Cadastro realizado com sucesso!";
         }
 

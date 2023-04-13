@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Pedido;
+use App\Models\Produto;
+use App\Models\PedidoProduto;
 
 class PedidoProdutoController extends Controller
 {
@@ -13,7 +16,7 @@ class PedidoProdutoController extends Controller
      */
     public function index()
     {
-        //
+       
     }
 
     /**
@@ -21,9 +24,11 @@ class PedidoProdutoController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Pedido $pedido)
     {
-        //
+        $produtos = Produto::all();
+        //$pedidos->produtos; executar eager loadin para trazer os produtos relacionados ao pedido já no controller
+        return view('admin.pedido_produto.create', ['pedido' => $pedido, 'produtos' => $produtos]);
     }
 
     /**
@@ -32,9 +37,29 @@ class PedidoProdutoController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, Pedido $pedido)
     {
-        //
+         //inclusao
+         if($request->input('_token') != '' && $request->input('id') == ''){
+            //validacao
+            $regras = [
+                'produto_id' => 'exists:produtos,id'
+            ];
+
+            $feedback = [
+                'produto_id.exists' => 'O produto informado não existe!'
+            ];
+
+            $request->validate($regras, $feedback);
+
+            $pedidoProduto = new PedidoProduto();
+
+            $pedidoProduto->pedido_id = $pedido->id;
+            $pedidoProduto->produto_id = $request->get('produto_id');
+            $pedidoProduto->save();
+        }
+
+        return redirect()->route('pedido-produto.create', ['pedido' => $pedido->id]);
     }
 
     /**
